@@ -22,8 +22,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * @author pcdd
- * Created at 2024/3/27
+ * 69书吧书源特殊处理
+ * @author Bap
+ * Created at 2024/12/11
  */
 public class CatalogParser4 extends Source {
 
