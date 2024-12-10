@@ -35,6 +35,10 @@ public class Rule {
         private String latestChapter;
         private String author;
         private String update;
+        //判断搜索结果是否是书籍详情页
+        private String isBook;
+        //书籍url
+        private String bookUrl;
     }
 
     @Data
@@ -50,6 +54,10 @@ public class Rule {
         private String isEnd;
         private String catalog;
         private Integer catalogOffset;
+        //判断书籍详情页和目录是否同一页
+        private Boolean isCatalog;
+        //完整目录页url
+        private String catalogUrl;
     }
 
     @Data

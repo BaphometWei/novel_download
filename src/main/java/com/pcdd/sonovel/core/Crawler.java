@@ -6,21 +6,22 @@ import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
+import com.hankcs.hanlp.HanLP;
 import com.pcdd.sonovel.model.Book;
 import com.pcdd.sonovel.model.Chapter;
 import com.pcdd.sonovel.model.ConfigBean;
 import com.pcdd.sonovel.model.SearchResult;
-import com.pcdd.sonovel.parse.BookParser;
-import com.pcdd.sonovel.parse.CatalogParser;
-import com.pcdd.sonovel.parse.ChapterParser;
-import com.pcdd.sonovel.parse.SearchResultParser;
+import com.pcdd.sonovel.parse.*;
+import com.pcdd.sonovel.util.StringEx;
 import lombok.SneakyThrows;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
@@ -78,7 +79,7 @@ public class Crawler {
         Book book = new BookParser(config.getSourceId()).parse(url);
 
         // 小说目录名格式：书名(作者)
-        bookDir = String.format("%s (%s)", bookName, author);
+        bookDir = String.format("%s (%s)", HanLP.convertToSimplifiedChinese(StringEx.sNull(bookName)), author);
         // 必须 new File()，否则无法使用 . 和 ..
         File dir = FileUtil.mkdir(new File(config.getDownloadPath() + File.separator + bookDir));
         if (!dir.exists()) {
@@ -87,13 +88,24 @@ public class Crawler {
             return 0;
         }
 
-        Console.log("<== 正在获取章节目录", bookName);
+        Console.log("<== 正在获取章节目录", HanLP.convertToSimplifiedChinese(StringEx.sNull(bookName)));
         // 获取小说目录
-        CatalogParser catalogParser = new CatalogParser(config.getSourceId());
-        List<Chapter> catalog = catalogParser.parse(url, start, end);
+        List<Chapter> catalog = new ArrayList<>();
+        int catalogSize = 0;
+        try {
+            Class<?> clazz = Class.forName("com.pcdd.sonovel.parse.CatalogParser" + config.getSourceId());
+            Object instance = clazz.getDeclaredConstructor(int.class).newInstance(config.getSourceId());
+            Method method = clazz.getMethod("parse", String.class, int.class, int.class);
+            catalog = (List<Chapter>) method.invoke(instance, book.getCatalogUrl(), start, end);
+//            catalogSize = catalog.parse(url).size();
+        } catch (ClassNotFoundException e) {
+            CatalogParser catalogParser = new CatalogParser(config.getSourceId());
+            catalog = catalogParser.parse(book.getCatalogUrl(), start, end);
+            catalogSize = catalogParser.parse(url).size();
+        }
         // 防止 start、end 超出范围
         if (CollUtil.isEmpty(catalog)) {
-            Console.log(render(StrUtil.format("@|yellow 超出章节范围，该小说共 {} 章|@", catalogParser.parse(url).size())));
+            Console.log(render(StrUtil.format("@|yellow 超出章节范围，该小说共 {} 章|@", catalogSize)));
             return 0;
         }
 

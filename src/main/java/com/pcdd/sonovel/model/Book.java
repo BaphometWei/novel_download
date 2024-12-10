@@ -19,5 +19,5 @@ public class Book {
     private String latestUpdate;
     private String isEnd;
     private String catalog;
-
+    private String catalogUrl;
 }

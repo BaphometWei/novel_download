@@ -1,0 +1,49 @@
+{
+  "id": "4",
+  "url": "https://69shux.co/",
+  "name": "69书吧",
+  "comment": "搜索有反爬机制，爬取过快会丢包",
+  "type": "html",
+  "search": {
+    "url": "https://69shux.co/search",
+    "method": "post",
+    "body": "{'kw': 'searchkey', 'submit': 'Search'}",
+    "cookies": "{'zh_choose': 's', '_ga': 'GA1.1.1011964002.1733750777', '_ga_BBJPVSH9B2': 'GS1.1.1733757258.2.0.1733757267.0.0.0'}",
+    "pagination": true,
+    "nextPage": "#pagelink > a:not(.pgroup):not(.ngroup):not(.next)",
+    "result": "#article_list_content > li",
+    "bookName": "h3 > a:last-child",
+    "author": ".labelbox > label:nth-child(1)",
+    "latestChapter": ".zxzj > p > a",
+    "update": ".labelbox > label:nth-child(3)",
+    "isBook": ".bookbox",
+    "bookUrl": "content"
+  },
+  "book": {
+    "url": "meta[property=\"og:url\"]",
+    "bookName": ".booknav2 > h1 > a",
+    "author": ".booknav2 > p:nth-child(2) > a",
+    "intro": "meta[property=\"og:description\"]",
+    "category": ".booknav2 > p:nth-child(2) > a",
+    "coverUrl": ".bookimg2 > img",
+    "latestChapter": "li:nth-child(1) > a > span",
+    "latestUpdate": ".booknav2 > p:nth-child(4) > a",
+    "isEnd": "",
+    "isCatalog": false,
+    "catalogUrl": ".more-btn",
+    "catalog": "#allchapter > ul:nth-child(1) > li",
+    "catalogOffset": 0
+  },
+  "chapter": {
+    "url": "https://www.shuhaige.net/%s/%s.html",
+    "pagination": false,
+    "nextPage": "#pager_next",
+    "chapterNo": 0,
+    "title": ".txtnav > h1",
+    "content": "#txtcontent",
+    "paragraphTagClosed": true,
+    "paragraphTag": "p",
+    "filterTxt": "",
+    "filterTag": ""
+  }
+}

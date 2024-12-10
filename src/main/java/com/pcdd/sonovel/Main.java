@@ -13,9 +13,12 @@ import com.pcdd.sonovel.model.ConfigBean;
 import com.pcdd.sonovel.model.Rule;
 import com.pcdd.sonovel.util.ConfigUtils;
 import lombok.SneakyThrows;
+import org.jline.reader.EndOfFileException;
 import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
+import org.jline.reader.UserInterruptException;
 import org.jline.reader.impl.completer.StringsCompleter;
+import org.jline.reader.impl.history.DefaultHistory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 
@@ -29,9 +32,8 @@ import static org.fusesource.jansi.AnsiRenderer.render;
  * @author pcdd
  * Created at 2021/6/10
  * <p>
- * {@code mvnd clean compile && mvn exec:java}
- * <p>
- * {@code mvnd clean compile; mvn exec:java}
+ * IDEA 的终端无法开发 jline 程序，因此在 wt 中运行
+ * 启动命令：mvnd clean compile; mvn exec:java
  */
 public class Main {
 
@@ -49,40 +51,82 @@ public class Main {
     }
 
     private static void run() throws IOException {
-        List<String> options = List.of("1.下载小说", "2.检查更新", "3.查看配置文件", "4.使用须知", "5.结束程序");
+//        List<String> options = List.of("1.下载小说", "2.检查更新", "3.查看配置文件", "4.使用须知", "5.结束程序");
+//        Terminal terminal = TerminalBuilder.builder()
+//                .system(true)
+//                .build();
+//        LineReader lineReader = LineReaderBuilder.builder()
+//                .terminal(terminal)
+//                .completer(new StringsCompleter(options))
+//                .build();
+        List<String> options = List.of("1", "2", "3", "4", "5");
         Terminal terminal = TerminalBuilder.builder()
                 .system(true)
                 .build();
-        LineReader reader = LineReaderBuilder.builder()
+        LineReader lineReader = LineReaderBuilder.builder()
+                .history(new DefaultHistory())
                 .terminal(terminal)
                 .completer(new StringsCompleter(options))
                 .build();
 
+        final var prompt = "请输入功能序号选择功能：1.下载小说, 2.检查更新, 3.查看配置文件, 4.使用须知, 5.结束程序 > ";
+
         printHint();
 
         while (true) {
-            String cmd = reader.readLine("按 Tab 键选择功能: ").trim();
+            String line;
+            try {
+                line = lineReader.readLine(prompt);
+                if (!options.contains(line)) {
+                    Console.error("无效的选项，请重新选择");
+                }
+                if ("1".equals(line)) {
+                    new DownloadAction(config).execute(terminal);
+                }
+                if ("2".equals(line)) {
+                    new CheckUpdateAction().execute();
+                }
+                if ("3".equals(line)) {
+                    Console.log(config);
+                }
+                if ("4".equals(line)) {
+                    printHint();
+                }
+                if ("5".equals(line)) {
+                    Console.log("<== Bye :)");
+                    System.exit(0);
+                    break;
+                }
 
-            if (!options.contains(cmd)) {
-                Console.error("无效的选项，请重新选择");
+            } catch (UserInterruptException e) {
+                // Do nothing
+            } catch (EndOfFileException e) {
+                terminal.writer().println("\nByte.");
+                terminal.writer().flush();
+                return;
             }
-            if (options.get(0).equals(cmd)) {
-                new DownloadAction(config).execute(terminal);
-            }
-            if (options.get(1).equals(cmd)) {
-                new CheckUpdateAction().execute();
-            }
-            if (options.get(2).equals(cmd)) {
-                Console.log(config);
-            }
-            if (options.get(3).equals(cmd)) {
-                printHint();
-            }
-            if (options.get(4).equals(cmd)) {
-                Console.log("<== Bye :)");
-                System.exit(0);
-                break;
-            }
+//            String cmd = reader.readLine("按 Tab 键选择功能: ").trim();
+//
+//            if (!options.contains(cmd)) {
+//                Console.error("无效的选项，请重新选择");
+//            }
+//            if (options.get(0).equals(cmd)) {
+//                new DownloadAction(config).execute(terminal);
+//            }
+//            if (options.get(1).equals(cmd)) {
+//                new CheckUpdateAction().execute();
+//            }
+//            if (options.get(2).equals(cmd)) {
+//                Console.log(config);
+//            }
+//            if (options.get(3).equals(cmd)) {
+//                printHint();
+//            }
+//            if (options.get(4).equals(cmd)) {
+//                Console.log("<== Bye :)");
+//                System.exit(0);
+//                break;
+//            }
         }
 
         terminal.close();

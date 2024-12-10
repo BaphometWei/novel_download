@@ -14,7 +14,9 @@
     "bookName": "td.even > a",
     "author": "td:nth-of-type(3)",
     "latestChapter": "td.odd > a",
-    "update": "td:nth-of-type(4)"
+    "update": "td:nth-of-type(4)",
+    "isBook": "",
+    "bookUrl": ""
   },
   "book": {
     "url": "http://www.xbiqugu.net/0/%s/",
@@ -26,6 +28,7 @@
     "latestChapter": "",
     "latestUpdate": "",
     "isEnd": "",
+    "isCatalog": true,
     "catalog": "#list > dl > dd > a",
     "catalogOffset": 0
   },
@@ -37,7 +40,7 @@
     "content": "#content",
     "paragraphTagClosed": false,
     "paragraphTag": "<br><br>",
-    "filterTxt": "一秒记住【文学巴士&nbsp;】，精彩无弹窗免费阅读！|(www.xbiquge.la 新笔趣阁)，高速全文字在线阅读！|天才一秒记住本站地址：.。手机版阅读网址：m.",
+    "filterTxt": "一秒记住【文学巴士&nbsp;】，精彩无弹窗免费阅读！|(www.xbiquge.la 新笔趣阁)，高速全文字在线阅读！",
     "filterTag": "div p script"
   }
 }

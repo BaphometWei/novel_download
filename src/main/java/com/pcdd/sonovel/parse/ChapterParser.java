@@ -2,6 +2,7 @@ package com.pcdd.sonovel.parse;
 
 import cn.hutool.core.lang.Console;
 import cn.hutool.core.util.StrUtil;
+import com.hankcs.hanlp.HanLP;
 import com.pcdd.sonovel.core.ChapterConverter;
 import com.pcdd.sonovel.core.Source;
 import com.pcdd.sonovel.model.Chapter;
@@ -9,6 +10,7 @@ import com.pcdd.sonovel.model.ConfigBean;
 import com.pcdd.sonovel.model.SearchResult;
 import com.pcdd.sonovel.util.CrawlUtils;
 import com.pcdd.sonovel.util.RandomUA;
+import com.pcdd.sonovel.util.StringEx;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -37,7 +39,7 @@ public class ChapterParser extends Source {
 
     public Chapter parse(Chapter chapter, CountDownLatch latch, SearchResult sr) {
         try {
-            Console.log("<== 正在下载: 【{}】", chapter.getTitle());
+            Console.log("<== 正在下载: 【{}】", HanLP.convertToSimplifiedChinese(StringEx.sNull(chapter.getTitle())));
             chapter.setContent(crawl(chapter.getUrl(), false));
             latch.countDown();
             return chapterConverter.convert(chapter, config.getExtName());

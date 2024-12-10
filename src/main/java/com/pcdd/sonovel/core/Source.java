@@ -5,7 +5,8 @@ import cn.hutool.core.lang.Console;
 import cn.hutool.json.JSONUtil;
 import com.pcdd.sonovel.model.Rule;
 
-import static org.jline.jansi.AnsiRenderer.render;
+//import static org.jline.jansi.AnsiRenderer.render;
+import static org.fusesource.jansi.AnsiRenderer.render;
 
 /**
  * @author pcdd

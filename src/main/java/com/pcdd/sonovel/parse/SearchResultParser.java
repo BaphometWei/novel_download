@@ -2,18 +2,25 @@ package com.pcdd.sonovel.parse;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.lang.Console;
+import cn.hutool.core.net.URLDecoder;
+import cn.hutool.core.util.ObjectUtil;
+import cn.hutool.core.util.StrUtil;
+import com.hankcs.hanlp.HanLP;
 import com.pcdd.sonovel.core.Source;
 import com.pcdd.sonovel.model.Rule;
 import com.pcdd.sonovel.model.SearchResult;
 import com.pcdd.sonovel.util.CrawlUtils;
 import com.pcdd.sonovel.util.RandomUA;
+import com.pcdd.sonovel.util.StringEx;
 import lombok.SneakyThrows;
+import org.htmlunit.util.StringUtils;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -24,6 +31,9 @@ public class SearchResultParser extends Source {
 
     private static final int TIMEOUT_MILLS = 15_000;
 
+    //精确搜索，如果匹配成功，直接不展示目录，展示书籍详情页面
+    private static boolean isBook = false;
+
     public SearchResultParser(int sourceId) {
         super(sourceId);
     }
@@ -31,14 +41,16 @@ public class SearchResultParser extends Source {
     public List<SearchResult> parse(String keyword) {
         Rule.Search search = this.rule.getSearch();
         boolean isPaging = search.getPagination();
-
+        isBook = false;
         // 模拟搜索请求
         Document document;
         try {
-            Connection.Response resp = Jsoup.connect(search.getUrl())
+            String userAgent = RandomUA.generate();
+            String url = search.getUrl();
+            Connection.Response resp = Jsoup.connect(url)
                     .method(CrawlUtils.buildMethod(this.rule.getSearch().getMethod()))
                     .timeout(TIMEOUT_MILLS)
-                    .header("User-Agent", RandomUA.generate())
+                    .header("User-Agent", userAgent)
                     .data(CrawlUtils.buildParams(this.rule.getSearch().getBody(), keyword))
                     .cookies(CrawlUtils.buildCookies(this.rule.getSearch().getCookies()))
                     .execute();
@@ -47,13 +59,14 @@ public class SearchResultParser extends Source {
             Console.error(e.getMessage());
             return Collections.emptyList();
         }
-
         List<SearchResult> firstPageResults = getSearchResults(null, document);
+
+        if (isBook) return firstPageResults;
         if (!isPaging) return firstPageResults;
 
         Set<String> urls = new LinkedHashSet<>();
         for (Element e : document.select(search.getNextPage()))
-            urls.add(CrawlUtils.normalizeUrl(e.attr("href"), this.rule.getUrl()));
+            urls.add(CrawlUtils.normalizeUrl(URLDecoder.decode(e.attr("href"), StandardCharsets.UTF_8), this.rule.getUrl()));
 
         // 使用并行流处理分页 URL
         List<SearchResult> additionalResults = urls.parallelStream()
@@ -71,8 +84,33 @@ public class SearchResultParser extends Source {
         if (document == null)
             document = Jsoup.connect(url).timeout(TIMEOUT_MILLS).get();
 
-        Elements elements = document.select(rule.getResult());
         List<SearchResult> list = new ArrayList<>();
+        //如果搜索结果是书籍
+        Elements bookboxElements = document.select(rule.getIsBook());
+        if(CollUtil.isNotEmpty(bookboxElements)){
+            isBook = true;
+
+            Elements bookElements = document.select(this.rule.getBook().getBookName());
+            Elements authorElements = document.select(this.rule.getBook().getAuthor());
+            Elements bookLatestChapter = document.select(this.rule.getBook().getLatestChapter());
+
+            String bookName = bookElements.text();
+            String author = CollUtil.isNotEmpty(authorElements)?authorElements.text():"无";
+
+
+            SearchResult build = SearchResult.builder()
+                    .url(CrawlUtils.normalizeUrl(document.select(this.rule.getBook().getUrl()).attr(rule.getBookUrl()), this.rule.getUrl()))
+                    .bookName(StrUtil.isEmptyIfStr(bookName)?"": HanLP.convertToSimplifiedChinese(bookName))//繁体转简体
+                    .latestChapter(HanLP.convertToSimplifiedChinese(StringEx.sNull(bookLatestChapter.text())))
+                    .author(StrUtil.isEmptyIfStr(bookName)?"": HanLP.convertToSimplifiedChinese(author))
+                    .latestUpdate("")
+                    .build();
+
+            list.add(build);
+            return list;
+        }
+
+        Elements elements = document.select(rule.getResult());
         for (Element element : elements) {
             // jsoup 不支持一次性获取属性的值
             String href = element.select(rule.getBookName()).attr("href");
@@ -86,10 +124,10 @@ public class SearchResultParser extends Source {
 
             SearchResult build = SearchResult.builder()
                     .url(CrawlUtils.normalizeUrl(href, this.rule.getUrl()))
-                    .bookName(bookName)
-                    .latestChapter(latestChapter)
-                    .author(author)
-                    .latestUpdate(update)
+                    .bookName(StrUtil.isEmptyIfStr(bookName)?"": HanLP.convertToSimplifiedChinese(bookName))//繁体转简体
+                    .latestChapter(StrUtil.isEmptyIfStr(bookName)?"": HanLP.convertToSimplifiedChinese(latestChapter))
+                    .author(StrUtil.isEmptyIfStr(bookName)?"": HanLP.convertToSimplifiedChinese(author))
+                    .latestUpdate(StrUtil.isEmptyIfStr(bookName)?"": HanLP.convertToSimplifiedChinese(update))
                     .build();
 
             list.add(build);

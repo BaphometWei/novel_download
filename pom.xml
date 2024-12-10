@@ -66,10 +66,15 @@
             <artifactId>jansi</artifactId>
             <version>2.4.1</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>org.jline</groupId>
             <artifactId>jline</artifactId>
             <version>${jline.version}</version>
+        </dependency>-->
+        <dependency>
+            <groupId>org.jline</groupId>
+            <artifactId>jline</artifactId>
+            <version>3.21.0</version>
         </dependency>
         <!-- https://github.com/jline/jline3?tab=readme-ov-file#ffm-vs-jni-vs-jansi-vs-jna-vs-exec -->
         <!-- 不加运行 exe 报错 -->
@@ -82,6 +87,16 @@
             <groupId>me.tongfei</groupId>
             <artifactId>progressbar</artifactId>
             <version>0.10.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.htmlunit</groupId>
+            <artifactId>htmlunit</artifactId>
+            <version>4.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.hankcs</groupId>
+            <artifactId>hanlp</artifactId>
+            <version>portable-1.8.0</version> <!-- 请根据最新版本调整版本号 -->
         </dependency>
     </dependencies>
 
@@ -164,7 +179,7 @@
                             </classPath>
                             <jre>
                                 <!-- jre 目录，动态配置：-DjrePath=runtime -->
-                                <path>${jrePath}</path>
+                                <path>./jre</path>
                                 <minVersion>17</minVersion>
                             </jre>
                             <!-- Windows 资源管理器显示的可选版本信息 -->

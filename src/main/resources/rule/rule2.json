@@ -15,7 +15,9 @@
     "bookName": "dd > h3 > a",
     "author": "dd:nth-child(3) > span:nth-child(1)",
     "latestChapter": "dd:nth-child(5) > a",
-    "update": "dd:nth-child(5) > span"
+    "update": "dd:nth-child(5) > span",
+    "isBook": "",
+    "bookUrl": ""
   },
   "book": {
     "url": "https://www.shuhaige.net/%s/",
@@ -27,6 +29,7 @@
     "latestChapter": "",
     "latestUpdate": "",
     "isEnd": "",
+    "isCatalog": true,
     "catalog": "#list > dl > dd > a",
     "catalogOffset": 12
   },
