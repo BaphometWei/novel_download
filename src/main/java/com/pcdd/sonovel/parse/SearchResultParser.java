@@ -48,6 +48,7 @@ public class SearchResultParser extends Source {
             String userAgent = RandomUA.generate();
             String url = search.getUrl();
             Connection.Response resp = Jsoup.connect(url)
+                    .proxy("127.0.0.1", 10809)//设置代理
                     .method(CrawlUtils.buildMethod(this.rule.getSearch().getMethod()))
                     .timeout(TIMEOUT_MILLS)
                     .header("User-Agent", userAgent)

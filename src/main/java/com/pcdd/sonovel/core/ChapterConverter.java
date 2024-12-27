@@ -59,7 +59,7 @@ public class ChapterConverter {
 //                content = content.replaceAll(br, "\n");
             }
 
-            content = chapter.getTitle() + "\n".repeat(1) + content + "\n".repeat(3);
+            content = chapter.getTitle() + "\n".repeat(1) + content.replaceAll("<br>", "") + "\n".repeat(3);
         }
         if ("epub".equals(extName) || "html".equals(extName)) {
             chapter.setContent(content);

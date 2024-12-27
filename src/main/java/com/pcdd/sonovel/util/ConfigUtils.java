@@ -5,8 +5,10 @@ import cn.hutool.setting.Setting;
 import cn.hutool.setting.dialect.Props;
 import com.pcdd.sonovel.model.ConfigBean;
 import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -15,6 +17,7 @@ import java.nio.file.Paths;
  * @author pcdd
  * Created at 2024/3/23
  */
+@Slf4j
 @UtilityClass
 public class ConfigUtils {
 
@@ -41,6 +44,14 @@ public class ConfigUtils {
             // 用户配置文件默认路径
             String defaultPath = System.getProperty("user.dir") + File.separator + "config.ini";
             // 若默认路径也不存在，则抛出 FileNotFoundException
+            log.info("配置文件路径：{}", defaultPath);
+            File currentDir = new File(".");
+            log.info("当前目录绝对路径：{}", currentDir.getAbsolutePath());
+            try {
+                log.info("当前目录规范路径：{}", currentDir.getCanonicalPath());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
             return new Setting(defaultPath);
         }
 

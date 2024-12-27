@@ -63,6 +63,14 @@ public class CatalogParser4 extends Source {
         webClient.getCookieManager().setCookiesEnabled(true);
         webClient.getOptions().setTimeout(10000);
 
+        //设置代理
+        ProxyConfig proxyConfig = webClient.getOptions().getProxyConfig();
+        proxyConfig.setProxyHost("127.0.0.1");
+        proxyConfig.setProxyPort(10809);
+//        proxyConfig.setProxyUsername("proxy_username");//(可选)设置代理服务器的用户名。
+//        proxyConfig.setProxyPassword("proxy_password");
+        webClient.getOptions().setProxyConfig(proxyConfig);
+
         URL newUrl = new URL(url);
         WebRequest requestSettings = new WebRequest(newUrl, HttpMethod.GET);
         HtmlPage catalogPage = webClient.getPage(requestSettings);

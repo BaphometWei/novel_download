@@ -78,9 +78,9 @@ public class ChapterParser extends Source {
         boolean isPaging = this.rule.getChapter().getPagination();
         String nextUrl = url;
         StringBuilder sb = new StringBuilder();
-
         do {
             Document document = Jsoup.connect(nextUrl)
+                    .proxy("127.0.0.1", 10809)//设置代理
                     .timeout(TIMEOUT_MILLS)
                     .header("User-Agent", RandomUA.generate())
                     .get();

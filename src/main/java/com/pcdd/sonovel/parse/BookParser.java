@@ -42,6 +42,7 @@ public class BookParser extends Source {
     public Book parse(String url) {
         Rule.Book r = this.rule.getBook();
         Document document = Jsoup.connect(url)
+                .proxy("127.0.0.1", 10809)//设置代理
                 .timeout(TIMEOUT_MILLS)
                 .header(Header.USER_AGENT.getValue(), RandomUA.generate())
                 .get();
