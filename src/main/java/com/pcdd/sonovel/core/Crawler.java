@@ -93,6 +93,7 @@ public class Crawler {
         List<Chapter> catalog = new ArrayList<>();
         int catalogSize = 0;
         try {
+            //解决对应不同书源书籍目录跟详情页不在同一个页面的解析方式
             Class<?> clazz = Class.forName("com.pcdd.sonovel.parse.CatalogParser" + config.getSourceId());
             Object instance = clazz.getDeclaredConstructor(int.class).newInstance(config.getSourceId());
             Method method = clazz.getMethod("parse", String.class, int.class, int.class);
